@@ -32,7 +32,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.6, y: 0.35, z: 0.6}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -129,10 +129,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurretDemo.EnemyTarget
   teamId: 1
-  maxHealth: 10
-  showDeathMarker: 1
+  maxHealth: 20
+  showDeathMarker: 0
   deathMarkerLifeTimeSeconds: 0.35
   aimPoint: {fileID: 0}
+  ShakeDuration: 0.8
 --- !u!114 &8287636602627673769
 MonoBehaviour:
   m_ObjectHideFlags: 0

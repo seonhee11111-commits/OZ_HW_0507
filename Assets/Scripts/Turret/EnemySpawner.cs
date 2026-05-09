@@ -55,6 +55,8 @@ namespace TurretDemo
         [SerializeField] private int defaultCapacity = 10;
         [SerializeField] private int maxSize = 100;
 
+
+
         private void Awake()
         {
             Pool = new ObjectPool<GameObject>

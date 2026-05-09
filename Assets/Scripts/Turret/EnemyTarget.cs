@@ -41,10 +41,20 @@ namespace TurretDemo
         public int TeamId => teamId;
 
         public float CurrentHealth => currentHealth;
-
         public Transform CachedTransform => transform;
 
         public Vector3 AimWorldPosition => aimPoint != null ? aimPoint.position : transform.position;
+
+        private bool isDead;
+
+        [SerializeField] private float ShakeDuration = 0.5f;
+
+        private Vector3 originalScale;
+
+        private void Awake()
+        {
+            originalScale = transform.localScale;
+        }
 
         public void Initialize(EnemySpawner spawner)
         {
@@ -54,11 +64,14 @@ namespace TurretDemo
         private void OnEnable()
         {
             currentHealth = maxHealth;
+            isDead = false;
 
             if (!ActiveTargetsInternal.Contains(this))
             {
                 ActiveTargetsInternal.Add(this);
             }
+
+            StartCoroutine(SpawnScaleRoutine());
         }
 
         private void OnDisable()
@@ -73,15 +86,19 @@ namespace TurretDemo
         /// <returns>데미지가 적용되면 true를 반환합니다.</returns>
         public bool ApplyDamage(float damageAmount)
         {
-            if (damageAmount <= 0f)
+            if (damageAmount <= 0f || isDead)
             {
                 return false;
             }
 
             currentHealth -= damageAmount;
+
             if (currentHealth <= 0f)
             {
-                Die();
+                isDead = true;
+                CriticalHitController.Instance.StartFlash(0.1f, 0.8f);
+                StartCoroutine(DieShakeCoroutine());
+                //Die();
             }
 
             return true;
@@ -95,8 +112,42 @@ namespace TurretDemo
             }
 
             //Destroy(gameObject);
+            isDead = false;
             spawner.ReturnToPool(gameObject);
         }
+
+        private System.Collections.IEnumerator DieShakeCoroutine()
+        {
+            float elapsed = 0f;
+            Vector3 originalPos = transform.position;
+
+            while (elapsed < ShakeDuration)
+            {
+                elapsed += Time.deltaTime;
+                transform.position = originalPos + UnityEngine.Random.insideUnitSphere * 0.1f;
+                yield return null;
+            }
+
+            Die();
+        }
+
+        private System.Collections.IEnumerator SpawnScaleRoutine()
+        {
+            float duration = 0.5f;
+            float elapsed = 0f;
+
+            transform.localScale = Vector3.zero;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float progress = elapsed / duration;
+                transform.localScale = Vector3.Lerp(Vector3.zero, originalScale, progress);
+                yield return null;
+            }
+            transform.localScale  = originalScale;
+        }
+
 
         private void CreateDeathMarker()
         {
